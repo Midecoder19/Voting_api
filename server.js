@@ -11,9 +11,14 @@ const candidateRoutes = require('./routes/candidates');
 const app = express();
 app.use(express.json());
 
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
+
+// Root URL route
+app.get('/', (req, res) => {
+  res.send('Welcome to the School Voting API!');
+});
 
 app.use('/auth', authRoutes);
 app.use('/votes', voteRoutes);
