@@ -1,73 +1,69 @@
-const Student = require('../models/Student');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const sendCode = require('../utils/sendCode');
+const User = require('../models/User');
+const NACOS = require('../models/NACOS');
+const dotenv = require('dotenv');
 
-exports.register = async (req, res) => {
-  const { matricNumber, email, phone, level, nacosId, password } = req.body;
+dotenv.config();
+
+const register = async (req, res) => {
+  const { matricNumber, nacosId, level } = req.body;
 
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    // Check if the student belongs to NACOS
+    const nacosMember = await NACOS.findOne({ nacosId });
+    if (!nacosMember) {
+      return res.status(400).json({ error: 'NACOS ID not found' });
+    }
 
-    const student = new Student({
+    // Generate a unique code (password)
+    const password = Math.random().toString(36).slice(-8);
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({
       matricNumber,
-      email,
-      phone,
-      level,
       nacosId,
-      password: hashedPassword,
-      verificationCode,
+      level,
+      password: hashedPassword
     });
 
-    await student.save();
+    await newUser.save();
 
-    sendCode(email, verificationCode);
-
-    res.status(201).json({ message: 'Student registered. Please verify your email.' });
-  } catch (error) {
+    res.status(201).json({
+      message: 'User registered successfully',
+      matricNumber,
+      generatedCode: password // Return the generated code for the user
+    });
+  } catch (err) {
+    console.error('Error during registration:', err);
     res.status(500).json({ error: 'Registration failed.' });
   }
 };
 
-exports.login = async (req, res) => {
+const login = async (req, res) => {
   const { matricNumber, password } = req.body;
 
   try {
-    const student = await Student.findOne({ matricNumber });
-
-    if (!student || !await bcrypt.compare(password, student.password)) {
-      return res.status(400).json({ error: 'Invalid credentials.' });
+    const user = await User.findOne({ matricNumber });
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid matric number or password' });
     }
 
-    if (!student.verified) {
-      return res.status(400).json({ error: 'Please verify your email first.' });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Invalid matric number or password' });
     }
 
-    const token = jwt.sign({ id: student._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    res.json({ token });
-  } catch (error) {
+    res.status(200).json({ token });
+  } catch (err) {
+    console.error('Error during login:', err);
     res.status(500).json({ error: 'Login failed.' });
   }
 };
 
-exports.verifyCode = async (req, res) => {
-  const { matricNumber, code } = req.body;
-
-  try {
-    const student = await Student.findOne({ matricNumber });
-
-    if (!student || student.verificationCode !== code) {
-      return res.status(400).json({ error: 'Invalid code.' });
-    }
-
-    student.verified = true;
-    student.verificationCode = null;
-    await student.save();
-
-    res.json({ message: 'Email verified. You can now log in.' });
-  } catch (error) {
-    res.status(500).json({ error: 'Verification failed.' });
-  }
+module.exports = {
+  register,
+  login
 };
