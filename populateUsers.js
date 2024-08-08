@@ -1,37 +1,47 @@
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const User = require('./models/User');
 const bcrypt = require('bcrypt');
+const User = require('./models/User');
+const dotenv = require('dotenv');
 
 dotenv.config();
 
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB connection error:', err));
+
+// Define users to be populated
 const users = [
-  { matricNumber: '20240001', phone: '08011122334', email: 'student1@example.com', level: 'ND1', nacosId: '1234' },
-  { matricNumber: '20240002', phone: '08022334455', email: 'student2@example.com', level: 'ND1', nacosId: '5678' },
-  { matricNumber: '20240003', phone: '08033445566', email: 'student3@example.com', level: 'HND1', nacosId: '9101' },
+  { matricNumber: '20240001', nacosId: '1234', level: 'ND1' },
+  { matricNumber: '20240002', nacosId: '5678', level: 'HND1' },
+  { matricNumber: '20240003', nacosId: '9101', level: 'ND1' }
   // Add more users as needed
 ];
 
-const seedUsers = async () => {
-  try {
-    await mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
-    console.log('MongoDB connected');
+async function populateUsers() {
+  for (const userData of users) {
+    try {
+      // Generate a unique password
+      const password = Math.random().toString(36).slice(-8);
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Clear existing users
-    await User.deleteMany({});
+      // Create a new user with the provided data and the generated password
+      const user = new User({
+        matricNumber: userData.matricNumber,
+        nacosId: userData.nacosId,
+        level: userData.level,
+        password: hashedPassword
+      });
 
-    // Hash passwords and insert new users
-    for (let user of users) {
-      const hashedPassword = await bcrypt.hash('password123', 10); // Use a default password or generate one
-      user.password = hashedPassword;
-      await User.create(user);
+      // Save the user to the database
+      await user.save();
+      console.log(`User ${user.matricNumber} registered with password ${password}`);
+    } catch (err) {
+      console.error('Error registering user:', err);
     }
-    console.log('Users inserted');
-
-    mongoose.connection.close();
-  } catch (err) {
-    console.error('MongoDB connection error:', err);
   }
-};
 
-seedUsers();
+  // Close the database connection
+  mongoose.connection.close();
+}
+
+populateUsers();
