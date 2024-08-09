@@ -18,6 +18,11 @@ app.use('/api/vote', voteRoutes);
 app.use('/api/candidates', candidateRoutes);
 app.use('/api', dashboardRoutes);  // Add this line
 
+app.get('/', (req, res) => {
+  res.send('Welcome to the Voting API!');
+});
+
+
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
