@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const User = require('./models/User');
+const User = require('./models/User'); // Update the path as necessary
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -11,9 +11,10 @@ mongoose.connect(process.env.MONGODB_URI)
 
 // Define users to be populated
 const users = [
-  { matricNumber: '20240001', nacosId: '1234', level: 'ND1' },
-  { matricNumber: '20240002', nacosId: '5678', level: 'HND1' },
-  { matricNumber: '20240003', nacosId: '9101', level: 'ND1' }
+  { "matricNumber": "20240005", "level": "ND1" },
+  { "matricNumber": "20240006", "level": "HND1" },
+  { "matricNumber": "20240007", "level": "ND1" },
+  { "matricNumber": "2023235020245", "level": "HND1","nacosId":"4321" }
   // Add more users as needed
 ];
 
@@ -27,8 +28,8 @@ async function populateUsers() {
       // Create a new user with the provided data and the generated password
       const user = new User({
         matricNumber: userData.matricNumber,
-        nacosId: userData.nacosId,
         level: userData.level,
+        nacosId:userData.nacosId,
         password: hashedPassword
       });
 
@@ -41,7 +42,7 @@ async function populateUsers() {
   }
 
   // Close the database connection
-  mongoose.connection.close();
+  await mongoose.connection.close();
 }
 
 populateUsers();
