@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const bcrypt = require('bcryptjs');
 const authRoutes = require('./routes/auth');
 const voteRoutes = require('./routes/votes');
 const candidateRoutes = require('./routes/candidates'); // Update path as needed
