@@ -2,10 +2,12 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs'); 
 
 const userSchema = new mongoose.Schema({
-  matricNumber: { type: String, required: true },
+  matricNumber: { type: String, required: true, unique: true },
   level: { type: String, required: true },
-  nacosId: { type: String }, // Optional if not all users have it
-  password: { type: String, required: true }
+  nacosId: { type: String, required: true },
+  password: { type: String, required: true },
+  phone: { type: String },  // Optional field
+  verificationCode: { type: String },
 });
 
 // Instance method to compare passwords
