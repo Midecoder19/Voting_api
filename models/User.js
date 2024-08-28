@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
   level: { type: String, required: true },
   nacosId: { type: String, required: true },
   password: { type: String, required: true },
+  role: { type: String, enum: ['user', 'candidate'], default: 'user' }, // Added role field
   phone: { type: String },  // Optional field
   verificationCode: { type: String },
 });
