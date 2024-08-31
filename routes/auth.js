@@ -24,7 +24,7 @@ router.post('/login', async (req, res) => {
         user.verificationCode = verificationCode;
         await user.save();
 
-        // No email or phone number logic needed
+        
         res.send({ message: 'Login Succesfull. Please proceed.' });
     } catch (error) {
         console.error(error);

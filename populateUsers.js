@@ -14,7 +14,8 @@ const users = [
   { "matricNumber": "2023235020245", "level": "HND1","nacosId":"4321" },
   { "matricNumber": "20242000", "level": "ND1","nacosId":"5432" },
   { "matricNumber": "20243456", "level": "HND1","nacosId":"1324" },
-    { "matricNumber": "2023235020124", "level": "ND1","nacosId":"0087" }
+    { "matricNumber": "2023235020124", "level": "ND1","nacosId":"0087" },
+    { "matricNumber": "20232350201324", "level": "HND1","nacosId":"2234" }
   // Add more users as needed
 ];1
 
