@@ -15,6 +15,11 @@ router.post('/', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    // Ensure the user has a valid NACOS ID
+    if (!user.nacosId) {
+      return res.status(403).json({ error: 'Only users with a valid NACOS ID are allowed to vote' });
+    }
+
     if (user.role !== 'user') {
       return res.status(403).json({ error: 'Only users are allowed to vote' });
     }
