@@ -17,7 +17,7 @@ const users = [
     { "matricNumber": "2023235020124", "level": "ND1","nacosId":"0087" },
     { "matricNumber": "20232350201324", "level": "HND1","nacosId":"2234" }
   // Add more users as needed
-];1
+];
 
 async function populateUsers() {
   for (const userData of users) {

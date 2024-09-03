@@ -5,11 +5,11 @@ const Vote = require('../models/Vote');
 const User = require('../models/User');
 
 router.post('/', async (req, res) => {
-  const { userId, votes } = req.body; // votes is an array of objects with { candidateId, position }
+  const { nacosId, votes } = req.body; // votes is an array of objects with { candidateId, position }
 
   try {
-    // Fetch the user and check if they are allowed to vote
-    const user = await User.findById(userId);
+    // Fetch the user using nacosId
+    const user = await User.findOne({ nacosId });
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -28,7 +28,7 @@ router.post('/', async (req, res) => {
       const { candidateId, position } = votes[i];
 
       // Check if the user has already voted for this position
-      const existingVote = await Vote.findOne({ userId, position });
+      const existingVote = await Vote.findOne({ userId: user._id, position });
 
       if (existingVote) {
         return res.status(400).json({ error: `You have already voted for a candidate in the position: ${position}` });
@@ -46,7 +46,7 @@ router.post('/', async (req, res) => {
       }
 
       // Record the vote
-      const vote = new Vote({ userId, candidateId, position });
+      const vote = new Vote({ userId: user._id, candidateId, position });
       await vote.save();
     }
 
