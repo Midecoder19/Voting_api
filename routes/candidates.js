@@ -25,15 +25,37 @@ router.post('/vote/:candidateId', async (req, res) => {
   }
 });
 
-// Route to get all candidates
-router.get('/all', async (req, res) => {
-  try {
-    const candidates = await Candidate.find();
-    res.json(candidates);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
-  }
+
+// GET all candidates grouped by position
+router.get('/candidates/all', async (req, res) => {
+    try {
+        // Find all candidates
+        const candidates = await Candidate.find().sort({ position: 1 });
+
+        if (!candidates || candidates.length === 0) {
+            return res.status(404).json({ message: 'No candidates found' });
+        }
+
+        // Group candidates by position
+        const groupedCandidates = candidates.reduce((acc, candidate) => {
+            // Check if the position already exists in the accumulator
+            if (!acc[candidate.position]) {
+                acc[candidate.position] = [];
+            }
+            // Push candidate into the respective position array
+            acc[candidate.position].push(candidate);
+            return acc;
+        }, {});
+
+        // Send grouped candidates to frontend
+        res.status(200).json(groupedCandidates);
+    } catch (error) {
+        console.error('Error fetching candidates:', error);
+        res.status(500).json({ error: 'An error occurred while fetching candidates' });
+    }
 });
+
+module.exports = router;
+
 
 module.exports = router;

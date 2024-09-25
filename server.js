@@ -15,7 +15,7 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/vote', voteRoutes);
-app.use('/api/candidates', candidateRoutes);
+app.use('/api', candidateRoutes);
 app.use('/api', dashboardRoutes);  // Add this line
 
 app.get('/', (req, res) => {
