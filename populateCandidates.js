@@ -5,7 +5,7 @@ const Candidate = require('./models/Candidate');
 dotenv.config();
 
 const candidates = [
-  { name: 'John Doe', position: 'President', party: 'Party A' },
+  { name: 'Alonge Muhammad Ademole', position: 'President', party: 'Party A' },
   { name: 'Jane Smith', position: 'President', party: 'Party B' },
   { name: 'Michael Adams', position: 'President', party: 'Party C' },
   { name: 'Alice Johnson', position: 'Vice President', party: 'Party A' },
